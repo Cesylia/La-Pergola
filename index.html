@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Farmers Market Meals Stand – Feasibility Planner</title>
+<style>
+:root{--bg:#faf7f0;--card:#fff;--ink:#2b2a26;--mute:#6f6b60;--line:#e4dfd2;--accent:#2f6b3f;--good:#2f6b3f;--warn:#b7791f;--bad:#b3392f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1c18;--card:#242722;--ink:#ece8dc;--mute:#a09b8d;--line:#383c34;--accent:#7cc38c;--good:#7cc38c;--warn:#e0a94a;--bad:#e5766c}}
+:root[data-theme="dark"]{--bg:#1a1c18;--card:#242722;--ink:#ece8dc;--mute:#a09b8d;--line:#383c34;--accent:#7cc38c;--good:#7cc38c;--warn:#e0a94a;--bad:#e5766c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+h1{font-family:Georgia,serif;font-size:1.8rem;margin:.2em 0}
+h2{font-family:Georgia,serif;font-size:1.25rem;margin:0 0 10px}
+p.sub{color:var(--mute);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px 14px}
+label{display:flex;flex-direction:column;font-size:.82rem;color:var(--mute);gap:3px}
+input[type=number],input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mute);font-weight:600;font-size:.8rem}
+td input{min-width:70px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg)}
+.kpi b{display:block;font-size:1.3rem}
+.kpi span{font-size:.78rem;color:var(--mute)}
+.verdict{padding:12px 14px;border-radius:10px;border:2px solid var(--warn);font-weight:600;margin-bottom:12px}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.cl h3{margin:14px 0 4px;font-size:1rem;color:var(--accent)}
+.cl label{flex-direction:row;align-items:flex-start;gap:8px;color:var(--ink);font-size:.93rem;padding:2px 0}
+.cl input{margin-top:5px}
+.bar{height:8px;background:var(--line);border-radius:5px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--accent);width:0}
+.note{font-size:.82rem;color:var(--mute)}
+button{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+.pg{display:none}.pg.on{display:block}#tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}#tabs button.on{background:var(--accent);color:var(--bg);border-color:var(--accent)}textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}select{min-width:170px}
+.savebar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 14px;box-shadow:0 2px 8px rgba(0,0,0,.1)}.bigsave{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700;font-size:1.05rem;padding:10px 18px}.sstat{font-size:.85rem;color:var(--mute)}.sstat.ok{color:var(--good)}.sstat.bad{color:var(--bad)}.sstat.warn{color:var(--warn)}.sp{flex:1}
+</style>
+</head>
+<body>
+<main>
+<div class="savebar"><button class="bigsave" id="saveNow">💾 Save now</button><span class="sstat" id="sstat">Starting…</span><span class="sp"></span><button id="exp">⬇️ Export backup</button><button id="imp">⬆️ Import backup</button><input type="file" id="impf" accept=".json,application/json" hidden></div>
+<h1>🥕 Market Meals Stand – Feasibility Planner</h1>
+<p class="sub">Set up for a year-round Edmonton, Alberta market stand: smoothies and handhelds, 4 owner-operators, no employees in year one. Amounts are in CAD. Defaults are rough placeholders, not quotes, so replace them with real supplier prices. Everything recalculates live.</p>
+
+<nav id="tabs"><button class="on" data-t="plan">Feasibility</button><button data-t="menu">Menu</button><button data-t="ing">Ingredients &amp; stock</button><button data-t="rec">Recipes</button></nav>
+<div class="pg" data-p="plan">
+<div class="card"><h2>Results</h2><div id="verdict"></div><div class="kpis" id="kpis"></div>
+<div class="scroll"><table id="sens"></table></div>
+<p class="note">Sensitivity shows how season profit changes if customer traffic is above or below your estimate. Owner pay defaults to $0, so profit is what the four owners share. "Owner earnings / hour" shows what that works out to per person-hour.</p></div>
+
+<div class="card"><h2>1. Sales assumptions</h2><div class="grid" id="f-sales"></div></div>
+
+</div>
+<div class="pg" data-p="menu">
+<div class="card"><h2>Menu &amp; pricing</h2><p class="note">Cost per portion comes from the item's recipe once you build one. Until then, enter it manually.</p>
+<div class="scroll"><table id="menu"></table></div>
+<p style="margin:8px 0"><button data-act="addMenu">+ Add menu item</button></p><p class="note" id="menuNote"></p></div>
+</div>
+<div class="pg" data-p="plan">
+
+<div class="card"><h2>2. Costs per market day</h2><div class="grid" id="f-day"></div></div>
+<div class="card"><h2>3. Yearly fixed costs</h2><div class="grid" id="f-season"></div></div>
+<div class="card"><h2>4. Startup investment (one-time)</h2><div class="grid" id="f-start"></div></div>
+
+<div class="card cl"><h2>5. Operations checklist</h2>
+<div id="prog"></div><div class="bar"><i id="barfill"></i></div><div id="cl"></div>
+<p class="note">Rules vary by municipality and market. Confirm requirements with your local health authority and the market manager before spending money.</p></div>
+
+<div style="text-align:right"><button id="reset">Reset to defaults</button></div>
+</div>
+<div class="pg" data-p="ing"><div class="card"><h2>Ingredients: cost &amp; stock</h2><p class="note">Enter each supplier pack's price and size in the unit you use in recipes (e.g. $22 for a 2.5 kg bag). Stock is what you have on hand now; set a reorder level to flag low items.</p><div class="scroll"><table id="ingT"></table></div><p style="margin:8px 0"><button data-act="addIng">+ Add ingredient</button></p><p id="ingSum"></p></div></div>
+<div class="pg" data-p="rec"><p class="note">Each recipe is for one portion. Costs come from the Ingredients page and feed the menu's cost per portion and the feasibility results.</p><div id="recs"></div></div>
+</main>
+<script>
+const FIELDS={
+sales:[["days","Market days per year (e.g. 2/week × 52 = 104)",104,1],["cust","Paying customers per day",50,1],["ipc","Items per customer",1.4,0.1]],
+day:[["stall","Stall rental fee per day (CAD)",90,1],["staff","Owners working per day",4,1],["hours","Hours each (prep, market, cleanup)",8,0.5],["wage","Hourly pay to owners (0 = unpaid, profit shared)",0,0.5],["fuel","Travel / parking per day",15,1],["misc","Ice, cleaning supplies, electricity",15,1],["pack","Cups, lids, straws, wrappers per item",0.6,0.05],["card","Card fees (% of sales)",2.9,0.1],["waste","Food waste (% of food cost)",10,1]],
+season:[["ins","Liability insurance (per year)",600,10],["lic","Permits, licences, inspections",300,10],["kitchen","Commercial kitchen rental per month",350,10],["months","Months operating per year",12,1],["mkt","Marketing &amp; signage upkeep",200,10],["acct","Bookkeeping / accounting (per year)",600,10]],
+start:[["e1","Table, counter &amp; stand setup",400,10],["e2","Blenders (2–3 commercial, ~$450 each)",1350,10],["e3","Freezer / coolers for frozen fruit &amp; handhelds",900,10],["e4","Handwash station &amp; sanitizer setup",300,10],["e5","Display case for handhelds + signage",600,10],["e6","POS / card reader",150,10],["e7","Food safety courses (4 owners)",100,10],["e8","Utensils, packaging stock &amp; first ingredients",900,10],["cont","Contingency (%)",10,1]]};
+const MENU0=[["Fruit smoothie",9,2.6,45],["Protein / green smoothie",10.5,3.2,20],["Savoury handheld",7.5,2.6,20],["Sweet handheld",6,1.8,15]];
+const CL={"Alberta permits &amp; legal":["Ask the market manager whether your products fall under the market's Farmers' Market permit or need your own AHS Food Handling Permit (handhelds with meat/dairy often need closer review)","Confirm vendor eligibility rules at your market (Alberta-made / ingredient requirements)","Check if a City of Edmonton business licence applies","Register your business structure (partnership or corporation, with a 4-owner agreement)","Get vendor liability insurance (Alberta Farmers' Market Association offers daily and annual options)","Track GST: registration is required once revenue passes $30,000"],"Food safety":["All four owners take the free AHS food handling course","Confirm where prep is allowed: commercial kitchen vs. other approved options","Plan a hand sink or temporary handwashing station in the booth","Keep frozen fruit frozen and handhelds hot-held (above 60°C) or cold-held (below 4°C), with thermometers","Sanitize blenders between batches; label allergens (nuts, dairy, gluten)"],"Menu &amp; sourcing":["Cost every smoothie and handheld recipe per portion","Get quotes on frozen fruit in bulk from 2–3 suppliers","Pick 4–6 items that can be made in under 3 minutes","Plan seasonal specials (hot items in winter, iced in summer) since you operate year-round"],"Equipment &amp; setup":["Confirm power outlets and water access at your stall","Check blender circuit load for 2–3 units running at once","Pack list: spare blades, cleaning supplies, float cash, first-aid kit"],"Owners &amp; operations":["Write a 4-owner rota: who preps, blends, serves, and handles cash","Agree how profit is split and when owners start drawing pay","Agree a plan for slow days and cold-weather dips","Decide payment methods (cash, card, tap)"],"Marketing &amp; customers":["Create a clear menu board with prices and allergens","Set up social media and a loyalty card","Trial a few market days before buying all equipment"],"Risks to plan for":["Slow winter foot traffic","Fruit price swings and supply gaps","Equipment failure on market day","Competing smoothie or food vendors","Owner burnout from year-round weekends"]};
+const ING0=[['Frozen mixed berries','kg',22,2.5,10,5],['Frozen mango','kg',18,2.5,6,4],['Frozen banana','kg',12,5,5,3],['Yogurt','kg',14,4,6,3],['Apple juice','L',8,4,8,4],['Protein powder','kg',45,1,1,0.5],['Frozen spinach','kg',10,2,2,1],['Savoury filling','kg',48,4,4,2],['Pastry dough','kg',40,5,5,2],['Apple filling','kg',18,3,3,1.5]];
+const RECIPES0=[[[0,.1],[1,.08],[2,.05],[3,.05],[4,.1]],[[0,.1],[2,.08],[6,.04],[5,.03],[4,.15],[3,.05]],[[7,.12],[8,.1]],[[9,.1],[8,.08]]];
+const $=id=>document.getElementById(id);
+let S={},MENU=[],CHK={},ING=[],REC={};
+const KEY="mktstand-v2";
+function load(){try{let d=JSON.parse(localStorage.getItem(KEY)||"null");if(!d){const DEF=["Hearty soup &amp; bun","Grain bowl","Breakfast wrap","Seasonal pie slice","Fruit smoothie","Protein / green smoothie","Savoury handheld","Sweet handheld"];for(const k of ["mktstand-v1","mktstand-v2","mktstand-v3"]){try{const o=JSON.parse(localStorage.getItem(k)||"null");if(o&&o.MENU&&o.MENU.some(m=>!DEF.includes(m.n))){d={MENU:o.MENU.map((m,i)=>Object.assign({},m,{id:m.id||"m"+i}))};if(o.ING&&o.ING.length){d.ING=o.ING;d.REC=o.REC}break}}catch(e){}}}if(d){S=d.S||{};MENU=d.MENU||[];CHK=d.CHK||{};ING=d.ING||[];REC=d.REC||{};MENU.forEach((m,i)=>{if(!m.id)m.id="m"+i})}}catch(e){}
+for(const g in FIELDS)FIELDS[g].forEach(f=>{if(S[f[0]]===undefined)S[f[0]]=f[2]});
+if(!MENU.length){MENU=MENU0.map((m,i)=>({id:'m'+i,n:m[0],p:m[1],c:m[2],m:m[3]}));ING=ING0.map((g,i)=>({id:'g'+i,n:g[0],unit:g[1],price:g[2],size:g[3],stock:g[4],par:g[5]}));REC={};RECIPES0.forEach((lines,i)=>{REC['m'+i]={lines:lines.map(l=>({i:'g'+l[0],q:l[1]})),note:''}})}}
+const getState=()=>({S,MENU,CHK,ING,REC});
+function setStatus(t,c){const e=$('sstat');if(e){e.textContent=t;e.className='sstat '+(c||'')}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(getState()));setStatus('Saved on this device ✓ '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),'ok')}catch(e){setStatus('⚠️ Could not save on this device','bad')}}
+const money=n=>(n<0?"−":"")+"$"+Math.abs(Math.round(n)).toLocaleString();
+const v=k=>+S[k]||0;
+function calc(mult){
+ const ms=MENU.reduce((a,m)=>a+(+m.m||0),0)||1;
+ const wp=MENU.reduce((a,m)=>a+(+m.p||0)*(+m.m||0),0)/ms, wc=MENU.reduce((a,m)=>a+itemCost(m)*(+m.m||0),0)/ms;
+ const cust=v("cust")*mult, items=cust*v("ipc"), rev=items*wp;
+ const food=items*wc*(1+v("waste")/100), pack=items*v("pack"), fees=rev*v("card")/100;
+ const labour=v("staff")*v("hours")*v("wage");
+ const fixedDay=v("stall")+v("fuel")+v("misc")+labour;
+ const profitDay=rev-food-pack-fees-fixedDay;
+ const seasonFixed=v("ins")+v("lic")+v("kitchen")*v("months")+v("mkt")+v("acct");
+ const seasonRev=rev*v("days"), seasonProfit=profitDay*v("days")-seasonFixed;
+ const startRaw=["e1","e2","e3","e4","e5","e6","e7","e8"].reduce((a,k)=>a+v(k),0);
+ const startup=startRaw*(1+v("cont")/100);
+ const perCust=v("ipc")*(wp-wc*(1+v("waste")/100)-v("pack")-wp*v("card")/100);
+ const be=perCust>0?(fixedDay+seasonFixed/(v("days")||1))/perCust:Infinity;
+ return {wp,wc,rev,profitDay,seasonRev,seasonProfit,startup,be,seasonFixed,labour,foodPct:wp?wc*(1+v("waste")/100)/wp*100:0,
+  ownerHr:v("wage")+seasonProfit/((v("staff")*v("hours")*v("days"))||1),payback:seasonProfit>0?startup/seasonProfit:Infinity,margin:seasonRev?seasonProfit/seasonRev*100:0};
+}
+function render(){
+ const r=calc(1);
+ const kp=[["Revenue / market day",money(r.rev)],["Profit / market day",money(r.profitDay)],["Season revenue",money(r.seasonRev)],["Season profit",money(r.seasonProfit)],
+ ["Profit margin",r.margin.toFixed(1)+"%"],["Startup investment",money(r.startup)],["Payback",isFinite(r.payback)?r.payback.toFixed(1)+" seasons":"never at this level"],
+ ["Break-even customers/day",isFinite(r.be)?Math.ceil(r.be):"n/a"],["Owner earnings / hour","$"+r.ownerHr.toFixed(2)]];
+ $("kpis").innerHTML=kp.map(k=>`<div class="kpi"><span>${k[0]}</span><b class="${/profit|margin|earnings/i.test(k[0])?(parseFloat(k[1].replace("−","-").replace(/[$,]/g,""))<0?"neg":"pos"):""}">${k[1]}</b></div>`).join("");
+ let vd,col;
+ const cushion=isFinite(r.be)?(v("cust")-r.be)/v("cust"):-1;
+ if(r.seasonProfit<=0){vd="❌ Not feasible as modelled – the stand loses money at your expected traffic. Raise prices, cut labour or fees, or find a busier market.";col="var(--bad)"}
+ else if(cushion<0.25||r.payback>2||r.ownerHr<15){vd="⚠️ Marginal – profitable on paper, but thin cushion, slow payback, or owner earnings under about $15/hour (Alberta's minimum wage). Test a few market days before buying equipment.";col="var(--warn)"}
+ else{vd="✅ Looks feasible – healthy cushion above break-even and payback within about two seasons. Validate your traffic and price assumptions on the ground.";col="var(--good)"}
+ $("verdict").innerHTML=`<div class="verdict" style="border-color:${col}">${vd}</div>`;
+ $("menuNote").innerHTML=`Weighted average price <b>$${r.wp.toFixed(2)}</b>, food cost <b>${r.foodPct.toFixed(0)}%</b> of price (incl. waste). Typical food-service targets are about 28–35%. Labour per market day: <b>${money(r.labour)}</b>.`;
+ const fs=[0.5,0.75,1,1.25,1.5];
+ $("sens").innerHTML="<tr><th>Traffic vs estimate</th>"+fs.map(f=>`<th>${f*100}% (${Math.round(v("cust")*f)}/day)</th>`).join("")+"</tr><tr><td>Season profit</td>"+fs.map(f=>{const x=calc(f).seasonProfit;return `<td class="${x<0?"neg":"pos"}">${money(x)}</td>`}).join("")+"</tr>";
+}
+function fieldGroup(id,g){
+ $(id).innerHTML=FIELDS[g].map(f=>`<label>${f[1]}<input type="number" min="0" step="${f[3]}" data-k="${f[0]}" value="${S[f[0]]}"></label>`).join("");
+}
+function clRender(){
+ let tot=0,done=0;
+ $("cl").innerHTML=Object.entries(CL).map(([g,items])=>`<h3>${g}</h3>`+items.map(t=>{tot++;const k=g+"|"+t;if(CHK[k])done++;return `<label><input type="checkbox" data-c="${k.replace(/"/g,'&quot;')}" ${CHK[k]?"checked":""}><span>${t}</span></label>`}).join("")).join("");
+ $("prog").textContent=`${done} of ${tot} items done`;$("barfill").style.width=(done/tot*100)+"%";
+}
+document.addEventListener("input",e=>{
+ const t=e.target;
+ if(t.dataset.k){S[t.dataset.k]=t.value;}
+ else if(t.dataset.f){const m=MENU[+t.dataset.i];m[t.dataset.f]=t.dataset.f==="n"?t.value:(+t.value||0);mg(+t.dataset.i)}
+ else return;
+ save();render();
+});
+document.addEventListener("change",e=>{const c=e.target.dataset.c;if(c){CHK[c]=e.target.checked;save();clRender()}});
+$("reset").onclick=()=>{if(!confirm('Reset ALL data back to the defaults?'))return;try{localStorage.removeItem(KEY)}catch(e){}S={};MENU=[];CHK={};ING=[];REC={};init();save()};
+let TAB='plan';
+const uid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const ingBy=id=>ING.find(g=>g.id===id);
+const ucost=g=>(+g.size>0)?(+g.price||0)/g.size:0;
+function recCost(id){const r=REC[id];if(!r||!r.lines.length)return null;return r.lines.reduce((a,l)=>{const g=ingBy(l.i);return a+(g?ucost(g)*(+l.q||0):0)},0)}
+function itemCost(m){const c=recCost(m.id);return c==null?(+m.c||0):c}
+function canMake(id){const r=REC[id];if(!r)return null;let n=Infinity;r.lines.forEach(l=>{const g=ingBy(l.i);if(g&&+l.q>0)n=Math.min(n,Math.floor((+g.stock||0)/l.q))});return isFinite(n)?n:null}
+function setTab(t){TAB=t;document.querySelectorAll('.pg').forEach(p=>p.classList.toggle('on',p.dataset.p===t));document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));menuRender();ingRender();recRender();render()}
+function menuRender(){
+ $('menu').innerHTML='<tr><th>Item</th><th>Price</th><th>Cost / portion</th><th>Sales mix %</th><th>Margin</th><th></th></tr>'+MENU.map((m,i)=>{const rc=recCost(m.id);const cc=rc==null?`<input type='number' step='0.1' min='0' data-i='${i}' data-f='c' value='${m.c}'>`:`$${rc.toFixed(2)} <span class='note'>(recipe)</span>`;return `<tr><td><input type='text' data-i='${i}' data-f='n' value='${esc(m.n)}'></td><td><input type='number' step='0.25' min='0' data-i='${i}' data-f='p' value='${m.p}'></td><td>${cc}</td><td><input type='number' step='5' min='0' data-i='${i}' data-f='m' value='${m.m}'></td><td id='mg${i}'></td><td><button data-act='delMenu' data-x='${i}'>✕</button></td></tr>`}).join('');
+ MENU.forEach((m,i)=>mg(i));
+}
+function mg(i){const m=MENU[i],e=$('mg'+i);if(e)e.textContent=m.p>0?((m.p-itemCost(m))/m.p*100).toFixed(0)+'%':'–'}
+function ingRender(){
+ $('ingT').innerHTML='<tr><th>Ingredient</th><th>Unit</th><th>Pack price</th><th>Pack size</th><th>Cost / unit</th><th>In stock</th><th>Reorder at</th><th>Stock value</th><th>Status</th><th></th></tr>'+ING.map((g,i)=>{const inp=(f,t,w)=>`<input type='${t}' ${t==='number'?"step='any' min='0'":''} data-g='${i}' data-gf='${f}' value='${esc(g[f])}' style='${w||''}'>`;return `<tr><td>${inp('n','text','min-width:150px')}</td><td>${inp('unit','text','min-width:55px;width:60px')}</td><td>${inp('price','number')}</td><td>${inp('size','number')}</td><td id='gc${i}'></td><td>${inp('stock','number')}</td><td>${inp('par','number')}</td><td id='gv${i}'></td><td id='gs${i}'></td><td><button data-act='delIng' data-x='${i}'>✕</button></td></tr>`}).join('');
+ ING.forEach((g,i)=>ingUpd(i));ingSum();
+}
+function ingUpd(i){const g=ING[i];if(!$('gc'+i))return;$('gc'+i).textContent='$'+ucost(g).toFixed(2)+'/'+(g.unit||'unit');$('gv'+i).textContent=money((+g.stock||0)*ucost(g));const low=(+g.stock||0)<=(+g.par||0);$('gs'+i).innerHTML=low?'<b class="neg">Reorder</b>':'<span class="pos">OK</span>'}
+function ingSum(){const tv=ING.reduce((a,g)=>a+(+g.stock||0)*ucost(g),0),low=ING.filter(g=>(+g.stock||0)<=(+g.par||0)).map(g=>g.n);$('ingSum').innerHTML='Inventory value: <b>'+money(tv)+'</b>. '+(low.length?'Reorder soon: <b>'+low.map(esc).join(', ')+'</b>.':'Nothing is below its reorder level.')}
+function recRender(){
+ $('recs').innerHTML=MENU.map(m=>{const r=REC[m.id]||(REC[m.id]={lines:[],note:''});const opts=sel=>ING.map(g=>`<option value='${g.id}' ${g.id===sel?'selected':''}>${esc(g.n)}</option>`).join('');const rows=r.lines.map((l,j)=>{const g=ingBy(l.i);return `<tr><td><select data-rl='${m.id}|${j}'>${opts(l.i)}</select></td><td><input type='number' step='any' min='0' data-rq='${m.id}|${j}' value='${l.q}'></td><td>${g?esc(g.unit):''}</td><td id='lc${m.id}_${j}'></td><td><button data-act='delLine' data-x='${m.id}|${j}'>✕</button></td></tr>`}).join('');return `<div class='card'><h2>${esc(m.n)}</h2><div class='scroll'><table><tr><th>Ingredient</th><th>Qty per portion</th><th>Unit</th><th>Cost</th><th></th></tr>${rows}</table></div><p style='margin:8px 0'><button data-act='addLine' data-x='${m.id}'>+ Add ingredient</button></p><label>Method / notes<textarea data-rn='${m.id}' rows='3'>${esc(r.note)}</textarea></label><p class='note' id='rs${m.id}'></p></div>`}).join('')||'<p class=note>Add menu items first.</p>';
+ recUpd();
+}
+function recUpd(){MENU.forEach(m=>{const r=REC[m.id];if(!r)return;r.lines.forEach((l,j)=>{const g=ingBy(l.i),e=$('lc'+m.id+'_'+j);if(e)e.textContent=g?'$'+(ucost(g)*(+l.q||0)).toFixed(2):'–'});const e=$('rs'+m.id);if(!e)return;if(!r.lines.length){e.textContent='No recipe yet: the menu uses its manual cost per portion.';return}const c=recCost(m.id)||0,cm=canMake(m.id);e.innerHTML='Cost per portion: <b>$'+c.toFixed(2)+'</b> · price $'+(+m.p||0).toFixed(2)+' · margin <b>'+(m.p>0?((m.p-c)/m.p*100).toFixed(0)+'%':'–')+'</b> (ingredients only, excl. packaging)'+(cm==null?'':' · portions possible from current stock: <b>'+cm+'</b>')})}
+document.addEventListener('input',e=>{const t=e.target,d=t.dataset;if(d.g!==undefined){const g=ING[+d.g],f=d.gf;g[f]=(f==='n'||f==='unit')?t.value:(+t.value||0);save();ingUpd(+d.g);ingSum();recUpd();render()}else if(d.rq){const p=d.rq.split('|');REC[p[0]].lines[+p[1]].q=+t.value||0;save();recUpd();render()}else if(d.rn){REC[d.rn].note=t.value;save()}});
+document.addEventListener('change',e=>{const d=e.target.dataset;if(d.rl){const p=d.rl.split('|');REC[p[0]].lines[+p[1]].i=e.target.value;save();recRender();render()}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act],[data-t]');if(!b)return;if(b.dataset.t){setTab(b.dataset.t);return}const a=b.dataset.act,x=b.dataset.x;if(a==='addMenu'){MENU.push({id:uid(),n:'New item',p:0,c:0,m:10})}else if(a==='delMenu'){const m=MENU.splice(+x,1)[0];delete REC[m.id]}else if(a==='addIng'){ING.push({id:uid(),n:'New ingredient',unit:'kg',price:0,size:1,stock:0,par:0})}else if(a==='delIng'){const g=ING.splice(+x,1)[0];Object.values(REC).forEach(r=>{r.lines=r.lines.filter(l=>l.i!==g.id)})}else if(a==='addLine'){if(!ING.length)return;REC[x].lines.push({i:ING[0].id,q:0})}else if(a==='delLine'){const p=x.split('|');REC[p[0]].lines.splice(+p[1],1)}else return;save();menuRender();ingRender();recRender();render()});
+function applyState(o){S=o.S||{};MENU=o.MENU||[];CHK=o.CHK||{};ING=o.ING||[];REC=o.REC||{};for(const g in FIELDS)FIELDS[g].forEach(f=>{if(S[f[0]]===undefined)S[f[0]]=f[2]});MENU.forEach((m,i)=>{if(!m.id)m.id='m'+i});fieldGroup('f-sales','sales');fieldGroup('f-day','day');fieldGroup('f-season','season');fieldGroup('f-start','start');clRender();setTab(TAB)}
+function exportBackup(){const json=JSON.stringify({app:'market-stand-planner',version:1,saved:new Date().toISOString(),data:getState()},null,2);const name='market-stand-backup-'+new Date().toISOString().slice(0,10)+'.json';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setStatus('Backup file downloaded ✓','ok')}
+$('saveNow').onclick=save;$('exp').onclick=exportBackup;$('imp').onclick=()=>$('impf').click();
+$('impf').onchange=async ev=>{const f=ev.target.files[0];ev.target.value='';if(!f)return;try{const o=JSON.parse(await f.text());const d=o.data||o;if(!d.MENU&&!d.S)throw new Error('bad');if(!confirm('Replace the current data with this backup?'))return;applyState(d);save();setStatus('Backup loaded ✓','ok')}catch(e){alert('That file is not a planner backup.')}};
+function init(){load();fieldGroup('f-sales','sales');fieldGroup('f-day','day');fieldGroup('f-season','season');fieldGroup('f-start','start');clRender();setTab(TAB);setStatus('Saved on this device only. Use Export backup to keep or share a copy.','warn')}
+init();
+</script>
+</body>
+</html>
